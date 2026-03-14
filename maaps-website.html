@@ -5538,12 +5538,41 @@
   // SUPABASE AUTH FUNCTIONS
   // ============================================
   async function handleLogin(email, password) {
-    // Check localStorage for registered users first
+    // Try Supabase FIRST for real-time data sync
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        
+        if (!error && data && data.user) {
+          currentUser = data.user;
+          // Get user metadata for name
+          currentUserProfile = {
+            id: data.user.id,
+            email: data.user.email,
+            full_name: data.user.user_metadata?.full_name || data.user.email.split('@')[0],
+            phone: data.user.user_metadata?.phone || '',
+            role: 'user' // Will be updated by loadUserProfile
+          };
+          await loadUserProfile();
+          console.log('Logged in via Supabase, user ID:', data.user.id);
+          onLoginSuccess();
+          return;
+        }
+        
+        // If Supabase returns error, show it
+        if (error) {
+          console.log('Supabase login error:', error.message);
+        }
+      } catch (err) {
+        console.log('Supabase login exception:', err);
+      }
+    }
+    
+    // Fallback to localStorage for offline/demo mode
     const demoUsers = JSON.parse(localStorage.getItem('maaps_users') || '{}');
     const demoUser = demoUsers[email];
     
     if (demoUser) {
-      // Verify password for registered user
       if (demoUser.password !== password) {
         showAuthMessage('Invalid password. Please try again.');
         return;
@@ -5558,72 +5587,20 @@
         role: demoUser.role
       };
       isAdmin = demoUser.role === 'admin';
+      console.log('Logged in via localStorage (demo mode)');
       onLoginSuccess();
       return;
     }
     
-    // Try Supabase if available
-    if (supabaseClient) {
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        
-        if (error) {
-          showAuthMessage('Invalid email or password. Please try again.');
-          return;
-        }
-        
-        if (data && data.user) {
-          currentUser = data.user;
-          // Get user metadata for name
-          currentUserProfile = {
-            id: data.user.id,
-            email: data.user.email,
-            full_name: data.user.user_metadata?.full_name || data.user.email.split('@')[0],
-            phone: data.user.user_metadata?.phone || '',
-            role: 'user' // Will be updated by loadUserProfile
-          };
-          await loadUserProfile();
-          onLoginSuccess();
-          return;
-        }
-      } catch (err) {
-        console.log('Supabase login error:', err);
-      }
-    }
-    
-    // No user found - show error
-    showAuthMessage('Account not found. Please register first.');
+    // No user found
+    showAuthMessage('Invalid email or password. Please try again.');
   }
 
   async function handleRegister(name, email, phone, password) {
-    // For now, use demo mode to ensure functionality works
-    // Save user to localStorage for demo purposes
-    const demoUsers = JSON.parse(localStorage.getItem('maaps_users') || '{}');
-    
-    if (demoUsers[email]) {
-      showAuthMessage('This email is already registered. Please sign in.');
-      return;
-    }
-    
-    // Save new user
-    demoUsers[email] = {
-      id: 'user-' + Date.now(),
-      email: email,
-      password: password, // In production, this would be hashed
-      full_name: name,
-      phone: phone,
-      role: email === 'admin@admin.com' ? 'admin' : 'user',
-      created_at: new Date().toISOString()
-    };
-    localStorage.setItem('maaps_users', JSON.stringify(demoUsers));
-    
-    showAuthMessage('Registration successful! You can now sign in.', 'success');
-    switchAuthTab('login');
-    
-    // Also try Supabase if available (for future when properly configured)
+    // Try Supabase FIRST for real-time data sync
     if (supabaseClient) {
       try {
-        console.log('Also attempting Supabase registration for:', email);
+        console.log('Attempting Supabase registration for:', email);
         const { data, error } = await supabaseClient.auth.signUp({
           email: email,
           password: password,
@@ -5631,15 +5608,49 @@
             data: { full_name: name, phone: phone }
           }
         });
+        
+        if (!error && data && data.user) {
+          console.log('Supabase signup successful:', data.user.id);
+          showAuthMessage('Registration successful! You can now sign in.', 'success');
+          switchAuthTab('login');
+          return; // Don't save to localStorage if Supabase worked
+        }
+        
         if (error) {
-          console.log('Supabase signup note:', error.message);
-        } else {
-          console.log('Supabase signup successful:', data);
+          console.log('Supabase signup error:', error.message);
+          // If rate limited or other error, fall through to localStorage
+          if (error.message.includes('rate limit')) {
+            showAuthMessage('Too many attempts. Please try again later.');
+            return;
+          }
         }
       } catch (err) {
-        console.log('Supabase signup skipped:', err.message);
+        console.log('Supabase signup exception:', err.message);
       }
     }
+    
+    // Fallback to localStorage for offline/demo mode
+    const demoUsers = JSON.parse(localStorage.getItem('maaps_users') || '{}');
+    
+    if (demoUsers[email]) {
+      showAuthMessage('This email is already registered. Please sign in.');
+      return;
+    }
+    
+    demoUsers[email] = {
+      id: 'user-' + Date.now(),
+      email: email,
+      password: password,
+      full_name: name,
+      phone: phone,
+      role: email === 'admin@admin.com' ? 'admin' : 'user',
+      created_at: new Date().toISOString()
+    };
+    localStorage.setItem('maaps_users', JSON.stringify(demoUsers));
+    
+    console.log('User saved to localStorage (demo mode)');
+    showAuthMessage('Registration successful! You can now sign in.', 'success');
+    switchAuthTab('login');
   }
   
   // Make auth functions globally accessible
