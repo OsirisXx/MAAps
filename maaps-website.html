@@ -6062,10 +6062,15 @@
 
     let order;
     
-    if (!supabaseClient) {
-      const orders = JSON.parse(localStorage.getItem('maaps_orders') || '[]');
-      order = orders.find(o => o.id === orderId);
-    } else {
+    // Always check localStorage first (works for all users)
+    const localOrders = JSON.parse(localStorage.getItem('maaps_orders') || '[]');
+    order = localOrders.find(o => o.id === orderId);
+    
+    // If not found in localStorage and user has valid Supabase ID, try Supabase
+    if (!order && supabaseClient && currentUser && currentUser.id && 
+        !currentUser.id.startsWith('demo-') && 
+        !currentUser.id.startsWith('user-') && 
+        !currentUser.id.startsWith('admin-')) {
       try {
         const { data, error } = await supabaseClient
           .from('orders')
@@ -6073,11 +6078,11 @@
           .eq('id', orderId)
           .single();
         
-        if (error) throw error;
-        order = data;
+        if (!error && data) {
+          order = data;
+        }
       } catch (err) {
-        content.innerHTML = '<div style="text-align: center; padding: 2rem; color: #dc3545;">Failed to load order details</div>';
-        return;
+        console.log('Supabase order fetch failed:', err);
       }
     }
 
@@ -7420,8 +7425,14 @@
           items: [...this.cart]
         };
 
-        if (supabaseClient && currentUser) {
-          // Save to Supabase
+        // Check if user has a valid Supabase UUID (not a demo user)
+        const isValidSupabaseUser = supabaseClient && currentUser && currentUser.id && 
+          !currentUser.id.startsWith('demo-') && 
+          !currentUser.id.startsWith('user-') && 
+          !currentUser.id.startsWith('admin-');
+        
+        if (isValidSupabaseUser) {
+          // Save to Supabase only for real Supabase users
           try {
             const { data: orderData, error: orderError } = await supabaseClient
               .from('orders')
@@ -7457,9 +7468,9 @@
 
             await supabaseClient.from('order_items').insert(orderItems);
             order.id = orderData.id;
+            console.log('Order saved to Supabase:', orderData.id);
           } catch (err) {
             console.error('Error saving order to Supabase:', err);
-            notificationSystem.show('Order saved locally. Will sync when online.', 'warning');
           }
         }
 
@@ -7961,39 +7972,36 @@
       // Users registry (local storage)
 
       recordLogin(email, name) {
-
-        const key = 'maaps_users';
-
+        const key = 'maaps_login_history';
         const raw = localStorage.getItem(key);
-
         const now = Date.now();
-
-        let users = raw ? JSON.parse(raw) : [];
-
-        const existing = users.find(u => u.email === email);
-
-        if (existing) {
-
-          existing.lastLogin = now;
-
-          existing.name = name || existing.name;
-
-        } else {
-
-          users.push({ email, name, lastLogin: now });
-
+        let users = [];
+        
+        try {
+          const parsed = raw ? JSON.parse(raw) : [];
+          users = Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          users = [];
         }
 
+        const existing = users.find(u => u.email === email);
+        if (existing) {
+          existing.lastLogin = now;
+          existing.name = name || existing.name;
+        } else {
+          users.push({ email, name, lastLogin: now });
+        }
         localStorage.setItem(key, JSON.stringify(users));
-
       },
 
       getUsers() {
-
-        const raw = localStorage.getItem('maaps_users');
-
-        return raw ? JSON.parse(raw) : [];
-
+        const raw = localStorage.getItem('maaps_login_history');
+        try {
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
       },
 
       renderUsersTable() {
