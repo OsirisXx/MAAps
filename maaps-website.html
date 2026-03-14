@@ -7480,15 +7480,20 @@
             await supabaseClient.from('order_items').insert(orderItems);
             order.id = orderData.id;
             console.log('Order saved to Supabase:', orderData.id);
+            // Don't save to localStorage if Supabase succeeded
           } catch (err) {
             console.error('Error saving order to Supabase:', err);
+            // Only save to localStorage if Supabase failed
+            const orders = JSON.parse(localStorage.getItem('maaps_orders') || '[]');
+            orders.unshift(order);
+            localStorage.setItem('maaps_orders', JSON.stringify(orders));
           }
+        } else {
+          // No Supabase or not valid user - save to localStorage
+          const orders = JSON.parse(localStorage.getItem('maaps_orders') || '[]');
+          orders.unshift(order);
+          localStorage.setItem('maaps_orders', JSON.stringify(orders));
         }
-
-        // Always save to localStorage as backup
-        const orders = JSON.parse(localStorage.getItem('maaps_orders') || '[]');
-        orders.unshift(order);
-        localStorage.setItem('maaps_orders', JSON.stringify(orders));
 
         // Clear cart
         this.cart = [];
