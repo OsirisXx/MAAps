@@ -3651,10 +3651,9 @@
         <span><i class="fas fa-clock"></i> Mon - Sat: 8:00 AM - 6:00 PM</span>
       </div>
       <div class="top-bar-right">
-        <a href="#"><i class="fab fa-facebook-f"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://www.facebook.com/share/1G2H7snQ4J/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/novatech527?igsh=MWhsNWwzNmtidWc4Nw==" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.tiktok.com/@novatech679?_r=1&_t=ZS-94hNwQTcXTe" target="_blank"><i class="fab fa-tiktok"></i></a>
       </div>
     </div>
   </div>
@@ -5468,17 +5467,29 @@
     currentUserProfile = null;
     isAdmin = false;
     
-    // Reset UI
+    // Clear app user state
+    app.user = null;
+    
+    // Clear localStorage session data
+    localStorage.removeItem('maaps_user');
+    localStorage.removeItem('maaps_current_user');
+    localStorage.removeItem('maaps_cart');
+    
+    // Clear cart
+    app.cart = [];
+    app.updateCartBadge();
+    
+    // Reset UI - show landing page
     document.getElementById('app-view').classList.add('hidden');
     document.getElementById('app-view').style.display = 'none';
     document.getElementById('landingPage').classList.remove('hidden');
     document.getElementById('landingPage').style.display = 'block';
     document.querySelectorAll('#landingPage section').forEach(s => s.style.display = '');
     
-    // Clear cart
-    localStorage.removeItem('maaps_cart');
-    app.cart = [];
-    app.updateCartBadge();
+    // Scroll to top
+    window.scrollTo(0, 0);
+    
+    console.log('User logged out successfully');
   }
 
   function onLoginSuccess() {
