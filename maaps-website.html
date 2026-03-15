@@ -6153,23 +6153,23 @@
 
       marketListings: [
 
-        { id: 1, name: 'Sweet Potato', price: 35, seller: 'Juan Farms', image: 'List of produce/sweet potato.jpg' },
+        { id: 1, name: 'Sweet Potato', price: 85, seller: 'Juan Farms', image: 'List of produce/sweet potato.jpg' },
 
-        { id: 2, name: 'Cassava Root', price: 28, seller: 'Maria Crops', image: 'List of produce/cassava root.webp' },
+        { id: 2, name: 'Cassava Root', price: 95, seller: 'Maria Crops', image: 'List of produce/cassava root.webp' },
 
-        { id: 3, name: 'Potato', price: 45, seller: 'Pedro Harvest', image: 'List of produce/potato.jpg' },
+        { id: 3, name: 'Potato', price: 193, seller: 'Pedro Harvest', image: 'List of produce/potato.jpg' },
 
-        { id: 4, name: 'Carrots', price: 50, seller: 'Rosa Fields', image: 'List of produce/carrots.jpg' },
+        { id: 4, name: 'Carrots', price: 195, seller: 'Rosa Fields', image: 'List of produce/carrots.jpg' },
 
-        { id: 5, name: 'Squash', price: 30, seller: 'Tony Agriculture', image: 'List of produce/Squash.jpg' },
+        { id: 5, name: 'Squash', price: 104, seller: 'Tony Agriculture', image: 'List of produce/Squash.jpg' },
 
-        { id: 6, name: 'Ginger', price: 120, seller: 'Luna Garden', image: 'List of produce/Ginger.webp' },
+        { id: 6, name: 'Ginger', price: 135, seller: 'Luna Garden', image: 'List of produce/Ginger.webp' },
 
-        { id: 7, name: 'Garlic', price: 180, seller: 'Santos Farm', image: 'List of produce/garlic.jpg' },
+        { id: 7, name: 'Garlic', price: 170, seller: 'Santos Farm', image: 'List of produce/garlic.jpg' },
 
-        { id: 8, name: 'Red Onion', price: 65, seller: 'Reyes Produce', image: 'List of produce/red onion.jpg' },
+        { id: 8, name: 'Red Onion', price: 95, seller: 'Reyes Produce', image: 'List of produce/red onion.jpg' },
 
-        { id: 9, name: 'Green Chili', price: 90, seller: 'Cruz Vegetables', image: 'List of produce/green chili.webp' }
+        { id: 9, name: 'Green Chili', price: 100, seller: 'Cruz Vegetables', image: 'List of produce/green chili.webp' }
 
       ],
 
@@ -6976,22 +6976,10 @@
                 <span style="font-size: 1rem; color: #666;">/kg</span>
               </div>
 
-              <!-- Seller Info -->
-              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #f8f9fa; border-radius: 12px; margin-bottom: 1.25rem;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #5DB736, #3d8a22); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem;">${listing.seller.charAt(0)}</div>
-                <div>
-                  <div style="font-size: 0.75rem; color: #888; font-weight: 500;">SELLER</div>
-                  <div style="font-size: 0.95rem; color: #333; font-weight: 600;">${listing.seller}</div>
-                </div>
-              </div>
-
               <!-- Action Buttons -->
               <div style="display: flex; gap: 0.75rem;">
                 <button onclick="app.addToCart(${index})" style="flex: 1; padding: 0.875rem; background: linear-gradient(135deg, #5DB736, #3d8a22); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(93,183,54,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(93,183,54,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(93,183,54,0.3)';">
                   🛒 Add to Cart
-                </button>
-                <button onclick="app.contactSeller('${listing.seller}')" style="padding: 0.875rem; background: white; color: #5DB736; border: 2px solid #5DB736; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#5DB736'; this.style.color='white';" onmouseout="this.style.background='white'; this.style.color='#5DB736';" title="Contact seller">
-                  💬
                 </button>
               </div>
 
@@ -7112,7 +7100,6 @@
 
             <div style="flex: 1;">
               <h4 style="color: #2e7d32; font-size: 1.2rem; margin-bottom: 0.5rem;">${item.name}</h4>
-              <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">Seller: ${item.seller}</p>
               <p style="color: #5DB736; font-size: 1.3rem; font-weight: 700;">₱${item.price}/kg</p>
             </div>
 
@@ -8172,12 +8159,12 @@
       if (!grid) return;
 
       const products = [
-        { name: 'Sweet Potato', price: 35, seller: 'Juan Farms', image: 'List of produce/sweet potato.jpg' },
-        { name: 'Ginger', price: 120, seller: 'Luna Garden', image: 'List of produce/Ginger.webp' },
-        { name: 'Garlic', price: 180, seller: 'Santos Farm', image: 'List of produce/garlic.jpg' },
-        { name: 'Carrots', price: 50, seller: 'Rosa Fields', image: 'List of produce/carrots.jpg' },
-        { name: 'Red Onion', price: 65, seller: 'Reyes Produce', image: 'List of produce/red onion.jpg' },
-        { name: 'Squash', price: 30, seller: 'Tony Agriculture', image: 'List of produce/Squash.jpg' }
+        { name: 'Sweet Potato', price: 85, seller: 'Juan Farms', image: 'List of produce/sweet potato.jpg' },
+        { name: 'Ginger', price: 135, seller: 'Luna Garden', image: 'List of produce/Ginger.webp' },
+        { name: 'Garlic', price: 170, seller: 'Santos Farm', image: 'List of produce/garlic.jpg' },
+        { name: 'Carrots', price: 195, seller: 'Rosa Fields', image: 'List of produce/carrots.jpg' },
+        { name: 'Red Onion', price: 95, seller: 'Reyes Produce', image: 'List of produce/red onion.jpg' },
+        { name: 'Squash', price: 104, seller: 'Tony Agriculture', image: 'List of produce/Squash.jpg' }
       ];
 
       grid.innerHTML = products.map((product, index) => `
@@ -8193,7 +8180,6 @@
           <div class="product-content">
             <div class="product-category">Fresh Produce</div>
             <h3 class="product-title">${product.name}</h3>
-            <div class="product-seller"><i class="fas fa-store"></i> ${product.seller}</div>
             <div class="product-price">
               <span class="price">₱${product.price}<span class="unit">/kg</span></span>
               <button class="add-to-cart-btn" onclick="showLogin()">
