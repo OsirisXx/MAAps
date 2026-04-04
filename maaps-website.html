@@ -1544,6 +1544,339 @@
     to { transform: translateX(100%); opacity: 0; }
   }
 
+  /* ========== CHAT SYSTEM STYLES ========== */
+  
+  /* Floating Chat Button */
+  #chat-float-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #5DB736, #3d8a22);
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(93, 183, 54, 0.4);
+    z-index: 9999;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #chat-float-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(93, 183, 54, 0.5);
+  }
+
+  #chat-float-btn .chat-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #f44336;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 2px solid white;
+  }
+
+  /* Chat Window Container */
+  #chat-window {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 400px;
+    height: 600px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    z-index: 9998;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #chat-window.active {
+    display: flex;
+    animation: chatSlideIn 0.3s ease;
+  }
+
+  @keyframes chatSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Chat Header */
+  .chat-header {
+    background: linear-gradient(135deg, #5DB736, #3d8a22);
+    color: white;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chat-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .chat-header-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .chat-header-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+  }
+
+  .chat-header-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Admin Chat Tabs */
+  .chat-tabs {
+    display: flex;
+    overflow-x: auto;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    padding: 0.5rem 0.5rem 0;
+    gap: 0.5rem;
+  }
+
+  .chat-tab {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .chat-tab:hover {
+    background: #f8f9fa;
+  }
+
+  .chat-tab.active {
+    background: white;
+    border-color: #5DB736;
+    color: #5DB736;
+    font-weight: 600;
+  }
+
+  .chat-tab .unread-badge {
+    background: #f44336;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .chat-tab .close-tab {
+    margin-left: 0.5rem;
+    color: #999;
+    cursor: pointer;
+  }
+
+  .chat-tab .close-tab:hover {
+    color: #f44336;
+  }
+
+  /* Chat Messages Area */
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chat-message {
+    display: flex;
+    gap: 0.75rem;
+    animation: messageSlideIn 0.3s ease;
+  }
+
+  @keyframes messageSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .chat-message.sent {
+    flex-direction: row-reverse;
+  }
+
+  .chat-message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5DB736, #3d8a22);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .chat-message.sent .chat-message-avatar {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+  }
+
+  .chat-message-content {
+    max-width: 70%;
+  }
+
+  .chat-message-bubble {
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    word-wrap: break-word;
+  }
+
+  .chat-message.sent .chat-message-bubble {
+    background: linear-gradient(135deg, #5DB736, #3d8a22);
+    color: white;
+  }
+
+  .chat-message-time {
+    font-size: 0.7rem;
+    color: #999;
+    margin-top: 0.25rem;
+    padding: 0 0.5rem;
+  }
+
+  .chat-message-sender {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    padding: 0 0.5rem;
+  }
+
+  /* Chat Input Area */
+  .chat-input-area {
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .chat-input {
+    flex: 1;
+    border: 2px solid #e9ecef;
+    border-radius: 24px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .chat-input:focus {
+    border-color: #5DB736;
+  }
+
+  .chat-send-btn {
+    background: linear-gradient(135deg, #5DB736, #3d8a22);
+    border: none;
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .chat-send-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(93, 183, 54, 0.3);
+  }
+
+  .chat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Empty State */
+  .chat-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .chat-empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    #chat-window {
+      width: calc(100vw - 20px);
+      height: calc(100vh - 120px);
+      right: 10px;
+      bottom: 80px;
+    }
+
+    #chat-float-btn {
+      bottom: 20px;
+      right: 20px;
+    }
+  }
+
   /* HIDDEN CLASS */
   .hidden {
     display: none !important;
@@ -3637,6 +3970,51 @@
 
 <!-- Toast Container -->
 <div id="toast-container"></div>
+
+<!-- ========== CHAT SYSTEM ========== -->
+<!-- Floating Chat Button -->
+<button id="chat-float-btn" class="hidden">
+  <i class="fas fa-comments"></i>
+  <span class="chat-badge hidden" id="chat-badge">0</span>
+</button>
+
+<!-- Chat Window -->
+<div id="chat-window">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <h3 id="chat-title">Support Chat</h3>
+    <div class="chat-header-actions">
+      <button class="chat-header-btn" id="chat-minimize-btn" title="Minimize">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Tabs (only visible for admins) -->
+  <div class="chat-tabs hidden" id="chat-tabs"></div>
+
+  <!-- Chat Messages Container -->
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-empty-state">
+      <i class="fas fa-comments"></i>
+      <p>Start a conversation with our support team!</p>
+    </div>
+  </div>
+
+  <!-- Chat Input Area -->
+  <div class="chat-input-area">
+    <input 
+      type="text" 
+      class="chat-input" 
+      id="chat-input" 
+      placeholder="Type your message..."
+      autocomplete="off"
+    >
+    <button class="chat-send-btn" id="chat-send-btn">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
 
 <!-- ========== LANDING PAGE ========== -->
 <div class="landing-page" id="landingPage">
@@ -8337,6 +8715,428 @@
         });
       }
     });
+
+    // ============================================
+    // CHAT SYSTEM
+    // ============================================
+    const ChatSystem = {
+      currentConversationId: null,
+      activeConversations: [],
+      messageSubscription: null,
+      conversationSubscription: null,
+      isAdmin: false,
+      currentUserId: null,
+      currentUserName: null,
+      unreadCounts: {},
+
+      async init() {
+        console.log('Initializing chat system...');
+        
+        // Wait for auth to be ready
+        if (!supabaseClient) {
+          console.log('Supabase not ready, waiting...');
+          setTimeout(() => this.init(), 1000);
+          return;
+        }
+
+        // Get current user
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+          console.log('No user logged in');
+          return;
+        }
+
+        this.currentUserId = user.id;
+        
+        // Get user profile to check if admin
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('role, full_name, email')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          this.isAdmin = profile.role === 'admin';
+          this.currentUserName = profile.full_name || profile.email || 'User';
+        }
+
+        // Show chat button
+        document.getElementById('chat-float-btn').classList.remove('hidden');
+
+        // Setup event listeners
+        this.setupEventListeners();
+
+        // Load conversations
+        await this.loadConversations();
+
+        // Setup realtime subscriptions
+        this.setupRealtimeSubscriptions();
+
+        console.log('Chat system initialized. Is admin:', this.isAdmin);
+      },
+
+      setupEventListeners() {
+        // Float button click
+        document.getElementById('chat-float-btn').addEventListener('click', () => {
+          this.toggleChatWindow();
+        });
+
+        // Minimize button
+        document.getElementById('chat-minimize-btn').addEventListener('click', () => {
+          this.toggleChatWindow();
+        });
+
+        // Send button
+        document.getElementById('chat-send-btn').addEventListener('click', () => {
+          this.sendMessage();
+        });
+
+        // Enter key to send
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            this.sendMessage();
+          }
+        });
+      },
+
+      toggleChatWindow() {
+        const chatWindow = document.getElementById('chat-window');
+        chatWindow.classList.toggle('active');
+        
+        if (chatWindow.classList.contains('active')) {
+          // Mark messages as read when opening
+          this.markMessagesAsRead();
+        }
+      },
+
+      async loadConversations() {
+        if (this.isAdmin) {
+          // Admin: Load all active conversations
+          const { data: conversations, error } = await supabaseClient
+            .from('conversations')
+            .select('*')
+            .eq('status', 'active')
+            .order('last_message_at', { ascending: false });
+
+          if (error) {
+            console.error('Error loading conversations:', error);
+            return;
+          }
+
+          this.activeConversations = conversations || [];
+          this.renderAdminTabs();
+
+          // Load first conversation if exists
+          if (this.activeConversations.length > 0) {
+            this.switchConversation(this.activeConversations[0].id);
+          }
+        } else {
+          // User: Load or create their conversation
+          let { data: conversation, error } = await supabaseClient
+            .from('conversations')
+            .select('*')
+            .eq('user_id', this.currentUserId)
+            .eq('status', 'active')
+            .single();
+
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error loading conversation:', error);
+            return;
+          }
+
+          if (!conversation) {
+            // Create new conversation
+            const { data: newConv, error: createError } = await supabaseClient
+              .from('conversations')
+              .insert({
+                user_id: this.currentUserId,
+                user_name: this.currentUserName,
+                user_email: (await supabaseClient.auth.getUser()).data.user.email
+              })
+              .select()
+              .single();
+
+            if (createError) {
+              console.error('Error creating conversation:', createError);
+              return;
+            }
+
+            conversation = newConv;
+          }
+
+          this.currentConversationId = conversation.id;
+          await this.loadMessages();
+        }
+      },
+
+      renderAdminTabs() {
+        const tabsContainer = document.getElementById('chat-tabs');
+        
+        if (!this.isAdmin || this.activeConversations.length === 0) {
+          tabsContainer.classList.add('hidden');
+          return;
+        }
+
+        tabsContainer.classList.remove('hidden');
+        tabsContainer.innerHTML = this.activeConversations.map(conv => {
+          const unreadCount = this.unreadCounts[conv.id] || 0;
+          const isActive = conv.id === this.currentConversationId;
+          
+          return `
+            <div class="chat-tab ${isActive ? 'active' : ''}" data-conv-id="${conv.id}">
+              <span>${conv.user_name || 'User'}</span>
+              ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : ''}
+            </div>
+          `;
+        }).join('');
+
+        // Add click listeners to tabs
+        tabsContainer.querySelectorAll('.chat-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            this.switchConversation(tab.dataset.convId);
+          });
+        });
+      },
+
+      async switchConversation(conversationId) {
+        this.currentConversationId = conversationId;
+        
+        // Update active tab
+        document.querySelectorAll('.chat-tab').forEach(tab => {
+          tab.classList.toggle('active', tab.dataset.convId === conversationId);
+        });
+
+        // Update chat title
+        const conv = this.activeConversations.find(c => c.id === conversationId);
+        if (conv) {
+          document.getElementById('chat-title').textContent = `Chat with ${conv.user_name || 'User'}`;
+        }
+
+        // Load messages
+        await this.loadMessages();
+        
+        // Mark as read
+        this.markMessagesAsRead();
+      },
+
+      async loadMessages() {
+        if (!this.currentConversationId) return;
+
+        const { data: messages, error } = await supabaseClient
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', this.currentConversationId)
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('Error loading messages:', error);
+          return;
+        }
+
+        this.renderMessages(messages || []);
+      },
+
+      renderMessages(messages) {
+        const container = document.getElementById('chat-messages');
+        
+        if (messages.length === 0) {
+          container.innerHTML = `
+            <div class="chat-empty-state">
+              <i class="fas fa-comments"></i>
+              <p>Start a conversation with our support team!</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = messages.map(msg => {
+          const isSent = msg.sender_id === this.currentUserId;
+          const initial = msg.sender_name ? msg.sender_name.charAt(0).toUpperCase() : 'U';
+          const time = new Date(msg.created_at).toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          });
+
+          return `
+            <div class="chat-message ${isSent ? 'sent' : ''}">
+              <div class="chat-message-avatar">${initial}</div>
+              <div class="chat-message-content">
+                ${!isSent ? `<div class="chat-message-sender">${msg.sender_name || 'Support'}</div>` : ''}
+                <div class="chat-message-bubble">${this.escapeHtml(msg.message_text)}</div>
+                <div class="chat-message-time">${time}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Scroll to bottom
+        container.scrollTop = container.scrollHeight;
+      },
+
+      async sendMessage() {
+        const input = document.getElementById('chat-input');
+        const message = input.value.trim();
+
+        if (!message || !this.currentConversationId) return;
+
+        const sendBtn = document.getElementById('chat-send-btn');
+        sendBtn.disabled = true;
+
+        try {
+          const { error } = await supabaseClient
+            .from('messages')
+            .insert({
+              conversation_id: this.currentConversationId,
+              sender_id: this.currentUserId,
+              sender_name: this.currentUserName,
+              sender_role: this.isAdmin ? 'admin' : 'user',
+              message_text: message,
+              is_read: false
+            });
+
+          if (error) throw error;
+
+          input.value = '';
+          
+        } catch (error) {
+          console.error('Error sending message:', error);
+          alert('Failed to send message. Please try again.');
+        } finally {
+          sendBtn.disabled = false;
+          input.focus();
+        }
+      },
+
+      async markMessagesAsRead() {
+        if (!this.currentConversationId) return;
+
+        const role = this.isAdmin ? 'user' : 'admin';
+
+        await supabaseClient
+          .from('messages')
+          .update({ is_read: true })
+          .eq('conversation_id', this.currentConversationId)
+          .eq('sender_role', role)
+          .eq('is_read', false);
+
+        // Update unread counts
+        await this.updateUnreadCounts();
+      },
+
+      async updateUnreadCounts() {
+        if (this.isAdmin) {
+          // Get unread counts for all conversations
+          for (const conv of this.activeConversations) {
+            const { count } = await supabaseClient
+              .from('messages')
+              .select('*', { count: 'exact', head: true })
+              .eq('conversation_id', conv.id)
+              .eq('sender_role', 'user')
+              .eq('is_read', false);
+
+            this.unreadCounts[conv.id] = count || 0;
+          }
+
+          // Update total badge
+          const totalUnread = Object.values(this.unreadCounts).reduce((a, b) => a + b, 0);
+          this.updateChatBadge(totalUnread);
+
+          // Re-render tabs
+          this.renderAdminTabs();
+        } else {
+          // Get unread count for user
+          const { count } = await supabaseClient
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('conversation_id', this.currentConversationId)
+            .eq('sender_role', 'admin')
+            .eq('is_read', false);
+
+          this.updateChatBadge(count || 0);
+        }
+      },
+
+      updateChatBadge(count) {
+        const badge = document.getElementById('chat-badge');
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      },
+
+      setupRealtimeSubscriptions() {
+        // Subscribe to new messages
+        this.messageSubscription = supabaseClient
+          .channel('messages')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+          }, async (payload) => {
+            const message = payload.new;
+            
+            // If message is for current conversation, add it
+            if (message.conversation_id === this.currentConversationId) {
+              await this.loadMessages();
+              
+              // Mark as read if window is open
+              if (document.getElementById('chat-window').classList.contains('active')) {
+                this.markMessagesAsRead();
+              } else {
+                this.updateUnreadCounts();
+              }
+            } else {
+              // Update unread counts
+              this.updateUnreadCounts();
+            }
+          })
+          .subscribe();
+
+        // Subscribe to conversation changes (for admins)
+        if (this.isAdmin) {
+          this.conversationSubscription = supabaseClient
+            .channel('conversations')
+            .on('postgres_changes', {
+              event: '*',
+              schema: 'public',
+              table: 'conversations'
+            }, async () => {
+              await this.loadConversations();
+            })
+            .subscribe();
+        }
+      },
+
+      escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      },
+
+      destroy() {
+        if (this.messageSubscription) {
+          supabaseClient.removeChannel(this.messageSubscription);
+        }
+        if (this.conversationSubscription) {
+          supabaseClient.removeChannel(this.conversationSubscription);
+        }
+      }
+    };
+
+    // Initialize chat system when user logs in
+    window.addEventListener('load', () => {
+      // Check if user is logged in and initialize chat
+      setTimeout(() => {
+        if (currentUser || (supabaseClient && currentUserProfile)) {
+          ChatSystem.init();
+        }
+      }, 2000);
+    });
+
+    // Make ChatSystem globally accessible
+    window.ChatSystem = ChatSystem;
 
   </script>
 
