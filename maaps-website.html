@@ -1328,28 +1328,7 @@
     border: 1px solid #ddd;
   }
 
-  .chat-input-area {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .chat-input-area input {
-    flex: 1;
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    outline: none;
-  }
-
-  .chat-input-area button {
-    padding: 0.8rem 1.5rem;
-    background: var(--green);
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-  }
+  /* Old chat-input-area styles removed to prevent conflicts with new chat system */
 
   /* PREDICTION STYLES */
   .prediction-form {
@@ -1832,6 +1811,9 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1;
   }
 
   .chat-send-btn:hover {
@@ -4010,8 +3992,10 @@
       placeholder="Type your message..."
       autocomplete="off"
     >
-    <button class="chat-send-btn" id="chat-send-btn">
-      <i class="fas fa-paper-plane"></i>
+    <button class="chat-send-btn" id="chat-send-btn" title="Send message">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
     </button>
   </div>
 </div>
@@ -4819,7 +4803,6 @@
           <button data-view="dashboard" class="nav-btn active">Dashboard</button>
           <button data-view="cart" class="nav-btn">Shopping Cart</button>
           <button data-view="my-orders" class="nav-btn">My Orders</button>
-          <button data-view="chat" class="nav-btn">Chat</button>
           <button data-view="price-prediction" class="nav-btn">Price Prediction</button>
           <button data-view="profile" class="nav-btn">Profile</button>
           <button data-view="admin" class="nav-btn" id="admin-nav-btn" style="display: none; background: linear-gradient(135deg, #ff6b6b, #ee5a5a); color: white !important;">Admin Panel</button>
@@ -5275,37 +5258,7 @@
 
     </div>
 
-    <!-- Chat View -->
-
-    <div id="chat-view" class="view">
-
-      <div class="chat-container">
-
-        <h2>Chat Support</h2>
-
-        <p>Get help with market analytics and connect with other farmers.</p>
-
-        <div id="chat-messages" class="chat-messages">
-
-          <div class="message bot">
-
-            <div class="message-bubble">Hi there! How can I help you with agricultural market analytics today?</div>
-
-          </div>
-
-        </div>
-
-        <div class="chat-input-area">
-
-          <input type="text" id="chat-input" placeholder="Type your message..." style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
-
-          <button id="send-message-btn" style="padding: 0.75rem 1.5rem; background: #2e7d32; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-left: 0.5rem;">Send</button>
-
-        </div>
-
-      </div>
-
-    </div>
+    <!-- Chat View - REMOVED: Now using floating chat system -->
 
     <!-- Price Prediction View -->
 
@@ -5921,6 +5874,13 @@
       } catch (e) {
         console.log('Error loading admin orders:', e);
       }
+    }
+
+    // Initialize chat system
+    if (window.ChatSystem) {
+      setTimeout(() => {
+        ChatSystem.init();
+      }, 500);
     }
 
     // Initialize app with proper user data
@@ -7120,15 +7080,7 @@
 
         document.getElementById('logout-btn').addEventListener('click', () => this.handleLogout());
 
-        // Chat
-
-        document.getElementById('send-message-btn').addEventListener('click', () => this.sendChatMessage());
-
-        document.getElementById('chat-input').addEventListener('keypress', (e) => {
-
-          if (e.key === 'Enter') this.sendChatMessage();
-
-        });
+        // Chat - REMOVED: Now using floating chat system
 
         // Price Prediction
 
@@ -7379,19 +7331,7 @@
 
       },
 
-      contactSeller(sellerName) {
-
-        this.switchView('chat');
-
-        const input = document.getElementById('chat-input');
-
-        input.value = `Hi, I'm interested in your product!`;
-
-        input.focus();
-
-        notificationSystem.show(`Connected with ${sellerName}`, 'success');
-
-      },
+      // contactSeller REMOVED - sellers removed from product cards
 
       // Shopping Cart Methods
       addToCart(listingIndex) {
@@ -7868,71 +7808,7 @@
         this.switchView(viewName);
       },
 
-      sendChatMessage() {
-
-        const input = document.getElementById('chat-input');
-
-        const message = input.value.trim();
-
-        if (!message) return;
-
-        this.addChatMessage(message, 'user');
-
-        this.chatHistory.push({ text: message, sender: 'user', timestamp: Date.now() });
-
-        this.saveChatHistory();
-
-        input.value = '';
-
-        setTimeout(() => {
-
-          const responses = [
-
-            'That sounds great! Is there anything else you\'d like to know?',
-
-            'Thanks for asking! Our team is here to help with market prices and connections.',
-
-            'I understand. Let me help you with that. Our market data is updated daily.',
-
-            'Great question! Sweet potato prices are trending well in Luzon this season.',
-
-            'You can check detailed pricing in the Price Prediction section or contact sellers directly.'
-
-          ];
-
-          const botMsg = responses[Math.floor(Math.random() * responses.length)];
-
-          this.addChatMessage(botMsg, 'bot');
-
-          this.chatHistory.push({ text: botMsg, sender: 'bot', timestamp: Date.now() });
-
-          this.saveChatHistory();
-
-        }, 500);
-
-      },
-
-      addChatMessage(text, sender) {
-
-        const messagesDiv = document.getElementById('chat-messages');
-
-        const messageEl = document.createElement('div');
-
-        messageEl.className = `message ${sender}`;
-
-        const bubble = document.createElement('div');
-
-        bubble.className = 'message-bubble';
-
-        bubble.textContent = text;
-
-        messageEl.appendChild(bubble);
-
-        messagesDiv.appendChild(messageEl);
-
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-      },
+      // OLD CHAT FUNCTIONS REMOVED - Now using real-time ChatSystem
 
       async handlePricePrediction(e) {
 
@@ -8097,19 +7973,7 @@
 
       },
 
-      renderChatHistory() {
-
-        const messagesDiv = document.getElementById('chat-messages');
-
-        messagesDiv.innerHTML = '<div class="message bot"><div class="message-bubble">Hi there! How can I help you with agricultural market analytics today?</div></div>';
-
-        this.chatHistory.forEach(msg => {
-
-          this.addChatMessage(msg.text, msg.sender);
-
-        });
-
-      },
+      // renderChatHistory REMOVED - using real-time ChatSystem
 
       updateUI() {
 
@@ -8125,7 +7989,7 @@
 
           document.getElementById('user-greeting').textContent = `Welcome back, ${this.user.name || this.user.full_name || currentUserProfile?.full_name || this.user.email?.split('@')[0] || 'User'}!`;
 
-          this.renderChatHistory();
+          // renderChatHistory call removed
 
           // record login to users registry (local only)
 
@@ -8761,7 +8625,13 @@
         }
 
         // Show chat button
-        document.getElementById('chat-float-btn').classList.remove('hidden');
+        const chatBtn = document.getElementById('chat-float-btn');
+        if (chatBtn) {
+          chatBtn.classList.remove('hidden');
+          console.log('Chat button shown');
+        } else {
+          console.error('Chat button not found!');
+        }
 
         // Setup event listeners
         this.setupEventListeners();
