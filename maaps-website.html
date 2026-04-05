@@ -1895,15 +1895,94 @@
 
   /* Chat Message Image */
   .chat-message-image {
-    max-width: 250px;
-    border-radius: 8px;
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 12px;
     margin-top: 0.5rem;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    object-fit: cover;
+    display: block;
   }
 
   .chat-message-image:hover {
-    transform: scale(1.02);
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+
+  /* Image Lightbox Modal */
+  .image-lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .image-lightbox.active {
+    display: flex;
+  }
+
+  .image-lightbox-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    animation: zoomIn 0.3s ease;
+  }
+
+  .image-lightbox-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  .image-lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: white;
+    border: none;
+    color: #333;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .image-lightbox-close:hover {
+    background: #f44336;
+    color: white;
+    transform: rotate(90deg);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes zoomIn {
+    from { 
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to { 
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   /* Empty State */
@@ -4102,6 +4181,14 @@
       </button>
       <div class="preview-info" id="preview-info"></div>
     </div>
+  </div>
+</div>
+
+<!-- Image Lightbox Modal -->
+<div class="image-lightbox" id="image-lightbox">
+  <div class="image-lightbox-content">
+    <button class="image-lightbox-close" id="lightbox-close" title="Close">×</button>
+    <img id="lightbox-image" src="" alt="Full size image">
   </div>
 </div>
 
@@ -7897,18 +7984,29 @@
           }
 
           // Update profile in Supabase
+          const updateData = {
+            full_name: document.getElementById('profile-fullname').value,
+            profile_picture_url: profilePictureUrl
+          };
+
+          // Only add optional fields if they exist in the table
+          const phone = document.getElementById('profile-phone').value;
+          const location = document.getElementById('profile-location').value;
+          const bio = document.getElementById('profile-bio').value;
+          
+          if (phone) updateData.phone = phone;
+          if (location) updateData.location = location;
+          if (bio) updateData.bio = bio;
+
           const { error } = await supabaseClient
             .from('profiles')
-            .update({
-              full_name: document.getElementById('profile-fullname').value,
-              phone: document.getElementById('profile-phone').value,
-              location: document.getElementById('profile-location').value,
-              bio: document.getElementById('profile-bio').value,
-              profile_picture_url: profilePictureUrl
-            })
+            .update(updateData)
             .eq('id', currentUser.id);
 
-          if (error) throw error;
+          if (error) {
+            console.error('Profile update error:', error);
+            throw error;
+          }
 
           // Update local user object
           this.user.fullname = document.getElementById('profile-fullname').value;
@@ -8740,6 +8838,45 @@
         });
       }
 
+      // Setup image lightbox
+      const lightbox = document.getElementById('image-lightbox');
+      const lightboxImage = document.getElementById('lightbox-image');
+      const lightboxClose = document.getElementById('lightbox-close');
+
+      // Close lightbox on close button click
+      if (lightboxClose) {
+        lightboxClose.addEventListener('click', () => {
+          lightbox.classList.remove('active');
+        });
+      }
+
+      // Close lightbox on background click
+      if (lightbox) {
+        lightbox.addEventListener('click', (e) => {
+          if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+          }
+        });
+      }
+
+      // Close lightbox on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+          lightbox.classList.remove('active');
+        }
+      });
+
+      // Delegate click events for chat images (since they're dynamically added)
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('chat-message-image')) {
+          const imageUrl = e.target.getAttribute('data-lightbox-image');
+          if (imageUrl && lightboxImage) {
+            lightboxImage.src = imageUrl;
+            lightbox.classList.add('active');
+          }
+        }
+      });
+
       // Setup new auth form handlers
       const loginForm = document.getElementById('login-form');
       const registerForm = document.getElementById('register-form');
@@ -9161,7 +9298,7 @@
                 ${!isSent ? `<div class="chat-message-sender">${msg.sender_name || 'Support'}</div>` : ''}
                 <div class="chat-message-bubble">
                   ${msg.message_text ? this.escapeHtml(msg.message_text) : ''}
-                  ${msg.image_url ? `<img src="${msg.image_url}" alt="${msg.image_name || 'Image'}" class="chat-message-image" onclick="window.open('${msg.image_url}', '_blank')">` : ''}
+                  ${msg.image_url ? `<img src="${msg.image_url}" alt="${msg.image_name || 'Image'}" class="chat-message-image" data-lightbox-image="${msg.image_url}">` : ''}
                 </div>
                 <div class="chat-message-time">${time}</div>
               </div>
