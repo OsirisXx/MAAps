@@ -1826,6 +1826,86 @@
     cursor: not-allowed;
   }
 
+  /* Chat Attach Button */
+  .chat-attach-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .chat-attach-btn:hover {
+    background: #f0f0f0;
+    color: #5DB736;
+  }
+
+  /* Chat Image Preview */
+  .chat-image-preview {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .preview-container {
+    position: relative;
+    display: inline-block;
+    max-width: 200px;
+  }
+
+  .preview-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid #5DB736;
+  }
+
+  .preview-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #f44336;
+    border: none;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .preview-remove:hover {
+    background: #d32f2f;
+  }
+
+  .preview-info {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  /* Chat Message Image */
+  .chat-message-image {
+    max-width: 250px;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .chat-message-image:hover {
+    transform: scale(1.02);
+  }
+
   /* Empty State */
   .chat-empty-state {
     display: flex;
@@ -3986,6 +4066,17 @@
   <!-- Chat Input Area -->
   <div class="chat-input-area">
     <input 
+      type="file" 
+      id="chat-image-input" 
+      accept="image/*" 
+      style="display: none;"
+    >
+    <button class="chat-attach-btn" id="chat-attach-btn" title="Attach image (max 3MB)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+      </svg>
+    </button>
+    <input 
       type="text" 
       class="chat-input" 
       id="chat-input" 
@@ -3997,6 +4088,20 @@
         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
       </svg>
     </button>
+  </div>
+  
+  <!-- Image Preview Area -->
+  <div class="chat-image-preview" id="chat-image-preview" style="display: none;">
+    <div class="preview-container">
+      <img id="preview-image" src="" alt="Preview">
+      <button class="preview-remove" id="preview-remove" title="Remove image">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="preview-info" id="preview-info"></div>
+    </div>
   </div>
 </div>
 
@@ -5201,6 +5306,25 @@
       <div class="profile-form">
 
         <form id="profile-settings-form">
+
+          <!-- Profile Picture Section -->
+          <div style="margin-bottom: 2rem; text-align: center;">
+            <label style="display: block; margin-bottom: 1rem; font-weight: 500;">Profile Picture</label>
+            <div style="position: relative; display: inline-block;">
+              <div id="profile-picture-preview" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #5DB736, #3d8a22); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; font-weight: bold; overflow: hidden; border: 4px solid #e9ecef;">
+                <span id="profile-picture-initial">U</span>
+                <img id="profile-picture-img" src="" alt="Profile" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
+              <button type="button" id="profile-picture-btn" style="position: absolute; bottom: 0; right: 0; background: #5DB736; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </button>
+            </div>
+            <div id="profile-picture-info" style="margin-top: 0.5rem; font-size: 0.85rem; color: #666;">Max 3MB</div>
+          </div>
 
           <div style="margin-bottom: 1rem;">
 
@@ -7735,24 +7859,82 @@
         }
       },
 
-      handleProfileSave(e) {
+      profilePictureFile: null,
+
+      async handleProfileSave(e) {
 
         e.preventDefault();
 
-        if (this.user) {
+        if (!this.user) return;
 
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+
+        try {
+          let profilePictureUrl = currentUserProfile?.profile_picture_url || null;
+
+          // Upload profile picture if selected
+          if (this.profilePictureFile) {
+            const fileName = `${currentUser.id}/profile_${Date.now()}.jpg`;
+            
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+              .from('profile-pictures')
+              .upload(fileName, this.profilePictureFile, {
+                cacheControl: '3600',
+                upsert: true
+              });
+
+            if (uploadError) throw uploadError;
+
+            // Get public URL
+            const { data: urlData } = supabaseClient.storage
+              .from('profile-pictures')
+              .getPublicUrl(fileName);
+
+            profilePictureUrl = urlData.publicUrl;
+          }
+
+          // Update profile in Supabase
+          const { error } = await supabaseClient
+            .from('profiles')
+            .update({
+              full_name: document.getElementById('profile-fullname').value,
+              phone: document.getElementById('profile-phone').value,
+              location: document.getElementById('profile-location').value,
+              bio: document.getElementById('profile-bio').value,
+              profile_picture_url: profilePictureUrl
+            })
+            .eq('id', currentUser.id);
+
+          if (error) throw error;
+
+          // Update local user object
           this.user.fullname = document.getElementById('profile-fullname').value;
-
           this.user.phone = document.getElementById('profile-phone').value;
-
           this.user.location = document.getElementById('profile-location').value;
-
           this.user.bio = document.getElementById('profile-bio').value;
+          
+          // Reload profile
+          await loadUserProfile();
+          
+          // Update chat system with new profile
+          if (window.ChatSystem) {
+            ChatSystem.currentUserName = currentUserProfile?.full_name || currentUser.email;
+          }
 
           this.saveSession();
+          this.profilePictureFile = null;
 
           notificationSystem.show('Profile updated successfully!', 'success');
 
+        } catch (error) {
+          console.error('Error updating profile:', error);
+          notificationSystem.show('Failed to update profile. Please try again.', 'error');
+        } finally {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
         }
 
       },
@@ -7794,6 +7976,21 @@
           document.getElementById('profile-location').value = this.user.location || '';
 
           document.getElementById('profile-bio').value = this.user.bio || '';
+
+          // Load profile picture
+          const profilePictureUrl = currentUserProfile?.profile_picture_url;
+          const img = document.getElementById('profile-picture-img');
+          const initial = document.getElementById('profile-picture-initial');
+          
+          if (profilePictureUrl) {
+            img.src = profilePictureUrl;
+            img.style.display = 'block';
+            initial.style.display = 'none';
+          } else {
+            img.style.display = 'none';
+            initial.style.display = 'block';
+            initial.textContent = (this.user.fullname || this.user.name || 'U').charAt(0).toUpperCase();
+          }
 
         }
 
@@ -8500,6 +8697,49 @@
       initLandingPage();
       app.init();
 
+      // Setup profile picture upload
+      const profilePictureBtn = document.getElementById('profile-picture-btn');
+      const profilePictureInput = document.getElementById('profile-picture-input');
+      
+      if (profilePictureBtn && profilePictureInput) {
+        profilePictureBtn.addEventListener('click', () => {
+          profilePictureInput.click();
+        });
+
+        profilePictureInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // Check file type
+          if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+          }
+
+          // Check file size (3MB)
+          const maxSize = 3 * 1024 * 1024;
+          if (file.size > maxSize) {
+            alert('Image size must be less than 3MB');
+            return;
+          }
+
+          // Store file
+          app.profilePictureFile = file;
+
+          // Show preview
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = document.getElementById('profile-picture-img');
+            const initial = document.getElementById('profile-picture-initial');
+            img.src = event.target.result;
+            img.style.display = 'block';
+            initial.style.display = 'none';
+            document.getElementById('profile-picture-info').textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
       // Setup new auth form handlers
       const loginForm = document.getElementById('login-form');
       const registerForm = document.getElementById('register-form');
@@ -8593,6 +8833,8 @@
       currentUserName: null,
       unreadCounts: {},
 
+      userProfiles: {},
+
       async init() {
         console.log('Initializing chat system...');
         
@@ -8615,13 +8857,14 @@
         // Get user profile to check if admin
         const { data: profile } = await supabaseClient
           .from('profiles')
-          .select('role, full_name, email')
+          .select('role, full_name, email, profile_picture_url')
           .eq('id', user.id)
           .single();
 
         if (profile) {
           this.isAdmin = profile.role === 'admin';
           this.currentUserName = profile.full_name || profile.email || 'User';
+          this.userProfiles[user.id] = profile;
         }
 
         // Show chat button
@@ -8645,6 +8888,24 @@
         console.log('Chat system initialized. Is admin:', this.isAdmin);
       },
 
+      async getUserProfile(userId) {
+        if (this.userProfiles[userId]) {
+          return this.userProfiles[userId];
+        }
+
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('full_name, email, profile_picture_url')
+          .eq('id', userId)
+          .single();
+
+        if (profile) {
+          this.userProfiles[userId] = profile;
+        }
+
+        return profile;
+      },
+
       setupEventListeners() {
         // Float button click
         document.getElementById('chat-float-btn').addEventListener('click', () => {
@@ -8654,6 +8915,21 @@
         // Minimize button
         document.getElementById('chat-minimize-btn').addEventListener('click', () => {
           this.toggleChatWindow();
+        });
+
+        // Attach image button
+        document.getElementById('chat-attach-btn').addEventListener('click', () => {
+          document.getElementById('chat-image-input').click();
+        });
+
+        // Image file input change
+        document.getElementById('chat-image-input').addEventListener('change', (e) => {
+          this.handleImageSelect(e);
+        });
+
+        // Remove image preview
+        document.getElementById('preview-remove').addEventListener('click', () => {
+          this.removeImagePreview();
         });
 
         // Send button
@@ -8667,6 +8943,47 @@
             this.sendMessage();
           }
         });
+      },
+
+      selectedImage: null,
+      selectedImageFile: null,
+
+      handleImageSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file');
+          return;
+        }
+
+        // Check file size (3MB = 3 * 1024 * 1024 bytes)
+        const maxSize = 3 * 1024 * 1024;
+        if (file.size > maxSize) {
+          alert('Image size must be less than 3MB');
+          return;
+        }
+
+        // Store file
+        this.selectedImageFile = file;
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          this.selectedImage = event.target.result;
+          document.getElementById('preview-image').src = event.target.result;
+          document.getElementById('preview-info').textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+          document.getElementById('chat-image-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      },
+
+      removeImagePreview() {
+        this.selectedImage = null;
+        this.selectedImageFile = null;
+        document.getElementById('chat-image-input').value = '';
+        document.getElementById('chat-image-preview').style.display = 'none';
       },
 
       toggleChatWindow() {
@@ -8806,7 +9123,7 @@
         this.renderMessages(messages || []);
       },
 
-      renderMessages(messages) {
+      async renderMessages(messages) {
         const container = document.getElementById('chat-messages');
         
         if (messages.length === 0) {
@@ -8819,20 +9136,33 @@
           return;
         }
 
+        // Fetch all unique sender profiles
+        const uniqueSenderIds = [...new Set(messages.map(m => m.sender_id))];
+        await Promise.all(uniqueSenderIds.map(id => this.getUserProfile(id)));
+
         container.innerHTML = messages.map(msg => {
           const isSent = msg.sender_id === this.currentUserId;
+          const profile = this.userProfiles[msg.sender_id];
           const initial = msg.sender_name ? msg.sender_name.charAt(0).toUpperCase() : 'U';
           const time = new Date(msg.created_at).toLocaleTimeString('en-US', { 
             hour: '2-digit', 
             minute: '2-digit' 
           });
 
+          // Avatar HTML - show profile picture if available, otherwise show initial
+          const avatarHtml = profile?.profile_picture_url 
+            ? `<img src="${profile.profile_picture_url}" alt="${msg.sender_name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` 
+            : initial;
+
           return `
             <div class="chat-message ${isSent ? 'sent' : ''}">
-              <div class="chat-message-avatar">${initial}</div>
+              <div class="chat-message-avatar">${avatarHtml}</div>
               <div class="chat-message-content">
                 ${!isSent ? `<div class="chat-message-sender">${msg.sender_name || 'Support'}</div>` : ''}
-                <div class="chat-message-bubble">${this.escapeHtml(msg.message_text)}</div>
+                <div class="chat-message-bubble">
+                  ${msg.message_text ? this.escapeHtml(msg.message_text) : ''}
+                  ${msg.image_url ? `<img src="${msg.image_url}" alt="${msg.image_name || 'Image'}" class="chat-message-image" onclick="window.open('${msg.image_url}', '_blank')">` : ''}
+                </div>
                 <div class="chat-message-time">${time}</div>
               </div>
             </div>
@@ -8847,12 +9177,42 @@
         const input = document.getElementById('chat-input');
         const message = input.value.trim();
 
-        if (!message || !this.currentConversationId) return;
+        // Check if we have either message or image
+        if (!message && !this.selectedImageFile) return;
+        if (!this.currentConversationId) return;
 
         const sendBtn = document.getElementById('chat-send-btn');
         sendBtn.disabled = true;
 
         try {
+          let imageUrl = null;
+          let imageName = null;
+          let imageSize = null;
+
+          // Upload image if selected
+          if (this.selectedImageFile) {
+            const fileName = `${this.currentUserId}/${Date.now()}_${this.selectedImageFile.name}`;
+            
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+              .from('chat-images')
+              .upload(fileName, this.selectedImageFile, {
+                cacheControl: '3600',
+                upsert: false
+              });
+
+            if (uploadError) throw uploadError;
+
+            // Get public URL
+            const { data: urlData } = supabaseClient.storage
+              .from('chat-images')
+              .getPublicUrl(fileName);
+
+            imageUrl = urlData.publicUrl;
+            imageName = this.selectedImageFile.name;
+            imageSize = this.selectedImageFile.size;
+          }
+
+          // Insert message
           const { error } = await supabaseClient
             .from('messages')
             .insert({
@@ -8860,13 +9220,17 @@
               sender_id: this.currentUserId,
               sender_name: this.currentUserName,
               sender_role: this.isAdmin ? 'admin' : 'user',
-              message_text: message,
+              message_text: message || null,
+              image_url: imageUrl,
+              image_name: imageName,
+              image_size: imageSize,
               is_read: false
             });
 
           if (error) throw error;
 
           input.value = '';
+          this.removeImagePreview();
           
         } catch (error) {
           console.error('Error sending message:', error);
