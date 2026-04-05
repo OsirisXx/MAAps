@@ -7983,13 +7983,17 @@
             profilePictureUrl = urlData.publicUrl;
           }
 
-          // Update profile in Supabase
+          // Update profile in Supabase - only update core fields first
           const updateData = {
-            full_name: document.getElementById('profile-fullname').value,
-            profile_picture_url: profilePictureUrl
+            full_name: document.getElementById('profile-fullname').value
           };
 
-          // Only add optional fields if they exist in the table
+          // Add profile picture if uploaded
+          if (profilePictureUrl) {
+            updateData.profile_picture_url = profilePictureUrl;
+          }
+
+          // Try to add optional fields (they may not exist in older schemas)
           const phone = document.getElementById('profile-phone').value;
           const location = document.getElementById('profile-location').value;
           const bio = document.getElementById('profile-bio').value;
@@ -7998,14 +8002,41 @@
           if (location) updateData.location = location;
           if (bio) updateData.bio = bio;
 
-          const { error } = await supabaseClient
+          console.log('Attempting to update profile with data:', updateData);
+
+          const { data, error } = await supabaseClient
             .from('profiles')
             .update(updateData)
-            .eq('id', currentUser.id);
+            .eq('id', currentUser.id)
+            .select();
 
           if (error) {
-            console.error('Profile update error:', error);
-            throw error;
+            console.error('Profile update error details:', {
+              message: error.message,
+              details: error.details,
+              hint: error.hint,
+              code: error.code,
+              updateData: updateData
+            });
+            
+            // If error is about missing columns, try with just full_name
+            if (error.message.includes('column') || error.code === '42703') {
+              console.log('Retrying with only full_name...');
+              const { data: retryData, error: retryError } = await supabaseClient
+                .from('profiles')
+                .update({ full_name: document.getElementById('profile-fullname').value })
+                .eq('id', currentUser.id)
+                .select();
+              
+              if (retryError) {
+                throw new Error(`Failed to update profile: ${retryError.message}`);
+              }
+              console.log('Profile updated successfully (basic fields only):', retryData);
+            } else {
+              throw new Error(`Failed to update profile: ${error.message}`);
+            }
+          } else {
+            console.log('Profile updated successfully:', data);
           }
 
           // Update local user object
