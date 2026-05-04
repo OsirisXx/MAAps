@@ -5223,8 +5223,13 @@
           </div>
           
           <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e9ecef;">
-            <span style="color: #666;">Shipping Fee:</span>
-            <span id="cart-shipping" style="font-weight: 600; color: #333;">₱50.00</span>
+            <span style="color: #666;">Delivery Fee:</span>
+            <span id="cart-delivery" style="font-weight: 600; color: #333;">₱99.00</span>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e9ecef;">
+            <span style="color: #666;">Convenience Fee:</span>
+            <span id="cart-convenience" style="font-weight: 600; color: #333;">₱99.00</span>
           </div>
           
           <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; font-size: 1.3rem;">
@@ -7626,7 +7631,9 @@
             </div>
           `;
           document.getElementById('cart-subtotal').textContent = '₱0.00';
-          document.getElementById('cart-total').textContent = '₱50.00';
+          document.getElementById('cart-delivery').textContent = '₱99.00';
+          document.getElementById('cart-convenience').textContent = '₱99.00';
+          document.getElementById('cart-total').textContent = '₱198.00';
           return;
         }
 
@@ -7663,10 +7670,13 @@
 
         // Update totals
         const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const shipping = 50;
-        const total = subtotal + shipping;
+        const deliveryFee = 99;
+        const convenienceFee = 99;
+        const total = subtotal + deliveryFee + convenienceFee;
 
         document.getElementById('cart-subtotal').textContent = `₱${subtotal.toFixed(2)}`;
+        document.getElementById('cart-delivery').textContent = `₱${deliveryFee.toFixed(2)}`;
+        document.getElementById('cart-convenience').textContent = `₱${convenienceFee.toFixed(2)}`;
         document.getElementById('cart-total').textContent = `₱${total.toFixed(2)}`;
       },
 
@@ -7683,8 +7693,9 @@
       renderCheckoutSummary() {
         const container = document.getElementById('checkout-summary');
         const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const shipping = 50;
-        const total = subtotal + shipping;
+        const deliveryFee = 99;
+        const convenienceFee = 99;
+        const total = subtotal + deliveryFee + convenienceFee;
 
         container.innerHTML = `
           <div style="margin-bottom: 1rem;">
@@ -7701,8 +7712,12 @@
               <span style="font-weight: 600;">₱${subtotal.toFixed(2)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span>Shipping Fee:</span>
-              <span style="font-weight: 600;">₱${shipping.toFixed(2)}</span>
+              <span>Delivery Fee:</span>
+              <span style="font-weight: 600;">₱${deliveryFee.toFixed(2)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span>Convenience Fee:</span>
+              <span style="font-weight: 600;">₱${convenienceFee.toFixed(2)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: #5DB736; margin-top: 0.5rem;">
               <span>Total:</span>
@@ -7716,8 +7731,9 @@
         const now = new Date();
         const orderNumber = 'MAAPS-' + now.toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const shippingFee = 50;
-        const totalAmount = subtotal + shippingFee;
+        const deliveryFee = 99;
+        const convenienceFee = 99;
+        const totalAmount = subtotal + deliveryFee + convenienceFee;
 
         const order = {
           id: 'order-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
@@ -7731,7 +7747,8 @@
           shipping_postal: orderData.postal,
           payment_method: orderData.paymentMethod,
           subtotal: subtotal,
-          shipping_fee: shippingFee,
+          shipping_fee: deliveryFee,
+          convenience_fee: convenienceFee,
           total_amount: totalAmount,
           status: 'pending',
           status_history: [{ status: 'pending', timestamp: now.toISOString() }],
@@ -7768,6 +7785,7 @@
                 payment_method: order.payment_method,
                 subtotal: order.subtotal,
                 shipping_fee: order.shipping_fee,
+                convenience_fee: order.convenience_fee,
                 total_amount: order.total_amount,
                 status: 'pending',
                 status_history: order.status_history
